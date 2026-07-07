@@ -1,0 +1,27 @@
+---
+description: Read documentation/ before exploring code or making changes
+alwaysApply: true
+---
+
+# Documentation-first workflow
+
+Before answering questions or editing this repo:
+
+1. **Read** `documentation/README.md` and open the doc(s) from its routing table.
+2. **Prefer docs over broad codebase search** — only read source files named in those docs or directly required for the task.
+3. **Update documentation** when you change API, architecture, config, career-master conventions, or UI behavior.
+4. **Do not re-add** removed features (Spring AI, markdown report writer) unless the user explicitly requests them — see `documentation/changelog.md`.
+
+## Doc map (quick)
+
+| Topic | Path |
+|-------|------|
+| Index / routing | `documentation/README.md` |
+| Architecture | `documentation/architecture.md` |
+| career-master | `documentation/career-master.md` |
+| Backend API | `documentation/jd-analyzer.md` |
+| Web UI | `documentation/web-ui.md` |
+| Dev / run / test | `documentation/development.md` |
+| History / decisions | `documentation/changelog.md` |
+
+For `career-master/**` content edits, also follow `.cursor/rules/career-master.mdc`.

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder — JD Match</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div>
+        <h1 id="profile-name">Loading profile…</h1>
+        <p id="profile-meta" class="muted"></p>
+      </div>
+      <div class="cv-picker">
+        <label for="cv-select">CV</label>
+        <select id="cv-select"></select>
+      </div>
+    </header>
+
+    <main>
+      <section class="card input-card">
+        <div class="tabs">
+          <button type="button" class="tab active" data-tab="upload">Upload JD</button>
+          <button type="button" class="tab" data-tab="paste">Paste text</button>
+        </div>
+
+        <div id="panel-upload" class="panel active">
+          <div id="drop-zone" class="drop-zone">
+            <input type="file" id="jd-file" accept=".pdf,.docx,.txt,.md" hidden>
+            <p>Drop job description here or <button type="button" id="browse-btn" class="link-btn">browse</button></p>
+            <p id="file-name" class="muted file-name"></p>
+          </div>
+        </div>
+
+        <div id="panel-paste" class="panel">
+          <textarea id="jd-text" rows="10" placeholder="Paste job description text…"></textarea>
+        </div>
+
+        <button type="button" id="analyze-btn" class="primary-btn">Analyze</button>
+      </section>
+
+      <section id="results" class="card results-card hidden">
+        <div class="score-row">
+          <div class="score-ring" id="score-ring">
+            <span id="score-value">0%</span>
+          </div>
+          <div class="score-meta">
+            <p id="score-count" class="muted"></p>
+            <p id="recommendation" class="recommendation"></p>
+            <p class="muted">Mode: <span id="analysis-mode">rule-based</span></p>
+          </div>
+        </div>
+
+        <div class="keyword-grid">
+          <div>
+            <h3>Matched</h3>
+            <div id="matched-chips" class="chips chips-ok"></div>
+          </div>
+          <div>
+            <h3>Missing</h3>
+            <div id="missing-chips" class="chips chips-miss"></div>
+          </div>
+          <div>
+            <h3>Nice-to-have matched</h3>
+            <div id="nice-matched-chips" class="chips chips-ok"></div>
+          </div>
+          <div>
+            <h3>Nice-to-have missing</h3>
+            <div id="nice-missing-chips" class="chips chips-warn"></div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Recommended projects</h3>
+          <ul id="projects-list"></ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>ATS flags</h3>
+          <ul id="ats-flags"></ul>
+        </div>
+      </section>
+
+      <p id="error" class="error hidden"></p>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

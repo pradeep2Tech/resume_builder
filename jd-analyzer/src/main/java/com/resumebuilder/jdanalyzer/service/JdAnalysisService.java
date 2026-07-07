@@ -14,19 +14,16 @@ public class JdAnalysisService {
     private final ResumeTextService resumeTextService;
     private final JdKeywordExtractorService keywordExtractorService;
     private final KeywordMatcherService keywordMatcherService;
-    private final AnalysisReportWriter reportWriter;
 
     public JdAnalysisService(
             SkillsRegistryService skillsRegistryService,
             ResumeTextService resumeTextService,
             JdKeywordExtractorService keywordExtractorService,
-            KeywordMatcherService keywordMatcherService,
-            AnalysisReportWriter reportWriter) {
+            KeywordMatcherService keywordMatcherService) {
         this.skillsRegistryService = skillsRegistryService;
         this.resumeTextService = resumeTextService;
         this.keywordExtractorService = keywordExtractorService;
         this.keywordMatcherService = keywordMatcherService;
-        this.reportWriter = reportWriter;
     }
 
     public JdAnalysisResponse analyze(JdAnalysisRequest request) {
@@ -40,7 +37,6 @@ public class JdAnalysisService {
 
         String jobDescription = resumeTextService.loadJobDescription(
                 request.jobDescription(),
-                request.jobDescriptionPath(),
                 jobDescriptionFile
         );
 
@@ -52,32 +48,6 @@ public class JdAnalysisService {
         );
         ExtractedJdKeywords extracted = keywordExtractorService.extract(jobDescription, registry);
 
-        String analysisMode = keywordExtractorService.isAiEnabled() ? "spring-ai" : "rule-based";
-        String reportPath = null;
-
-        JdAnalysisResponse response = keywordMatcherService.match(
-                extracted, resumeText, registry, analysisMode, null);
-
-        if (request.writeReport()) {
-            reportPath = reportWriter.write(response, request.reportSlug());
-            response = new JdAnalysisResponse(
-                    response.matchScore(),
-                    response.requiredCount(),
-                    response.matchedCount(),
-                    response.requiredKeywords(),
-                    response.matchedKeywords(),
-                    response.missingKeywords(),
-                    response.niceToHaveKeywords(),
-                    response.matchedNiceToHave(),
-                    response.missingNiceToHave(),
-                    response.synonymMatches(),
-                    response.atsFlags(),
-                    response.recommendedProjects(),
-                    response.analysisMode(),
-                    reportPath
-            );
-        }
-
-        return response;
+        return keywordMatcherService.match(extracted, resumeText, registry, "rule-based");
     }
 }

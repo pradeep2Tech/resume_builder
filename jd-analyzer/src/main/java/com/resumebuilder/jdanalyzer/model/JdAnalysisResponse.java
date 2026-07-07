@@ -15,7 +15,6 @@ public record JdAnalysisResponse(
         List<SynonymMatch> synonymMatches,
         List<String> atsFlags,
         List<String> recommendedProjects,
-        String analysisMode,
-        String reportPath
+        String analysisMode
 ) {
 }

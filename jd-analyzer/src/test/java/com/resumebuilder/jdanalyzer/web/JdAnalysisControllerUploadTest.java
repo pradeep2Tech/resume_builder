@@ -42,8 +42,7 @@ class JdAnalysisControllerUploadTest {
 
         mockMvc.perform(multipart("/api/v1/jd/analyze/upload")
                         .file(jdFile)
-                        .param("resumePath", "cvs/pradeep-cv-2026-ats/resume.md")
-                        .param("writeReport", "false"))
+                        .param("resumePath", "cvs/pradeep-cv-2026-ats/resume.md"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.matchScore").isNumber())
                 .andExpect(jsonPath("$.requiredKeywords").isArray())

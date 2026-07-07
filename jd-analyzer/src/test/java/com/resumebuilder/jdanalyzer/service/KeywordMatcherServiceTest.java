@@ -33,7 +33,7 @@ class KeywordMatcherServiceTest {
 
         String resume = "Senior Java architect with Kafka experience on Kubernetes clusters.";
 
-        JdAnalysisResponse response = matcher.match(extracted, resume, registry, "test", null);
+        JdAnalysisResponse response = matcher.match(extracted, resume, registry, "test");
 
         assertThat(response.matchScore()).isEqualTo(100);
         assertThat(response.missingKeywords()).isEmpty();
@@ -58,8 +58,7 @@ class KeywordMatcherServiceTest {
                 extracted,
                 "Java microservices developer",
                 registry,
-                "test",
-                null
+                "test"
         );
 
         assertThat(response.matchScore()).isEqualTo(33);

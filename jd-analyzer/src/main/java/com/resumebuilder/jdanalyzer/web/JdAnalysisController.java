@@ -1,8 +1,12 @@
 package com.resumebuilder.jdanalyzer.web;
 
+import com.resumebuilder.jdanalyzer.model.CvSummary;
 import com.resumebuilder.jdanalyzer.model.JdAnalysisRequest;
 import com.resumebuilder.jdanalyzer.model.JdAnalysisResponse;
+import com.resumebuilder.jdanalyzer.model.ProfileSummary;
+import com.resumebuilder.jdanalyzer.service.CvRegistryService;
 import com.resumebuilder.jdanalyzer.service.JdAnalysisService;
+import com.resumebuilder.jdanalyzer.service.ProfileService;
 import com.resumebuilder.jdanalyzer.service.SkillsRegistryService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,48 +27,53 @@ import java.util.Map;
 public class JdAnalysisController {
 
     private final JdAnalysisService jdAnalysisService;
+    private final ProfileService profileService;
+    private final CvRegistryService cvRegistryService;
     private final SkillsRegistryService skillsRegistryService;
 
-    public JdAnalysisController(JdAnalysisService jdAnalysisService, SkillsRegistryService skillsRegistryService) {
+    public JdAnalysisController(
+            JdAnalysisService jdAnalysisService,
+            ProfileService profileService,
+            CvRegistryService cvRegistryService,
+            SkillsRegistryService skillsRegistryService) {
         this.jdAnalysisService = jdAnalysisService;
+        this.profileService = profileService;
+        this.cvRegistryService = cvRegistryService;
         this.skillsRegistryService = skillsRegistryService;
     }
 
     @GetMapping("/health")
     public Map<String, String> health() {
-        return Map.of("status", "UP", "service", "jd-analyzer");
+        return Map.of("status", "UP", "service", "resume-builder");
     }
 
-    /**
-     * JSON endpoint for short JD text or server-side JD file path.
-     */
+    @GetMapping("/profile")
+    public ProfileSummary profile() {
+        return profileService.load();
+    }
+
+    @GetMapping("/cvs")
+    public List<CvSummary> cvs() {
+        return cvRegistryService.listCvs();
+    }
+
     @PostMapping("/jd/analyze")
     public ResponseEntity<JdAnalysisResponse> analyze(@RequestBody AnalyzeRequestBody body) {
-        JdAnalysisRequest request = toRequest(body);
+        JdAnalysisRequest request = new JdAnalysisRequest(
+                body.jobDescription(),
+                null,
+                body.resumePath()
+        );
         return ResponseEntity.ok(jdAnalysisService.analyze(request));
     }
 
-    /**
-     * Multipart endpoint for large JD files (PDF, DOCX, TXT, MD).
-     * Attach jobDescriptionFile; optionally attach resumeFile or pass resumePath.
-     */
     @PostMapping(value = "/jd/analyze/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<JdAnalysisResponse> analyzeUpload(
             @RequestPart("jobDescriptionFile") MultipartFile jobDescriptionFile,
-            @RequestPart(value = "resumeFile", required = false) MultipartFile resumeFile,
-            @RequestParam(value = "resumePath", required = false) String resumePath,
-            @RequestParam(value = "reportSlug", required = false) String reportSlug,
-            @RequestParam(value = "writeReport", defaultValue = "false") boolean writeReport) {
+            @RequestParam(value = "resumePath", required = false) String resumePath) {
 
-        JdAnalysisRequest request = new JdAnalysisRequest(
-                null,
-                null,
-                null,
-                resumePath,
-                reportSlug,
-                writeReport
-        );
-        return ResponseEntity.ok(jdAnalysisService.analyze(request, jobDescriptionFile, resumeFile));
+        JdAnalysisRequest request = new JdAnalysisRequest(null, null, resumePath);
+        return ResponseEntity.ok(jdAnalysisService.analyze(request, jobDescriptionFile, null));
     }
 
     @PostMapping("/skills/reload")
@@ -77,24 +87,6 @@ public class JdAnalysisController {
         );
     }
 
-    private JdAnalysisRequest toRequest(AnalyzeRequestBody body) {
-        return new JdAnalysisRequest(
-                body.jobDescription(),
-                body.jobDescriptionPath(),
-                body.resumeText(),
-                body.resumePath(),
-                body.reportSlug(),
-                body.writeReport()
-        );
-    }
-
-    public record AnalyzeRequestBody(
-            String jobDescription,
-            String jobDescriptionPath,
-            String resumeText,
-            String resumePath,
-            String reportSlug,
-            boolean writeReport
-    ) {
+    public record AnalyzeRequestBody(String jobDescription, String resumePath) {
     }
 }

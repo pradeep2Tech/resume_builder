@@ -10,12 +10,13 @@ GitHub-backed career profile for **Pradeep C.S.** — single source of truth for
 
 | Section | Description |
 |---------|-------------|
+| [documentation/](documentation/) | **Project docs — read first** (architecture, API, dev guide) |
 | [profile/](career-master/profile/) | Summary, skills, certifications, awards, education |
 | [companies/](career-master/companies/) | TCS, Yodlee, Entain, Netcracker |
 | [projects/](career-master/projects/) | Projects grouped by employer |
 | [cvs/](career-master/cvs/) | Tailored CV variants + [registry](career-master/cvs/index.md) |
 | [output/](career-master/output/) | Prompt-generated LinkedIn, cover letters, JD reports |
-| [jd-analyzer/](jd-analyzer/) | Spring Boot JD vs CV keyword analysis service |
+| [jd-analyzer/](jd-analyzer/) | Spring Boot web app — upload JD, view match results in browser |
 
 ## Career timeline
 

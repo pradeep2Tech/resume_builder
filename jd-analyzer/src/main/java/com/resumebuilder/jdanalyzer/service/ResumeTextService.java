@@ -19,10 +19,6 @@ public class ResumeTextService {
         this.documentTextExtractor = documentTextExtractor;
     }
 
-    public String loadResumeText(String resumeText, String resumePath) {
-        return loadResumeText(resumeText, resumePath, null);
-    }
-
     public String loadResumeText(String resumeText, String resumePath, MultipartFile resumeFile) {
         if (resumeFile != null && !resumeFile.isEmpty()) {
             return stripFrontMatter(documentTextExtractor.extractFromUpload(resumeFile));
@@ -34,23 +30,15 @@ public class ResumeTextService {
         return stripFrontMatter(documentTextExtractor.extractFromPath(path));
     }
 
-    public String loadJobDescription(String jobDescriptionText, String jobDescriptionPath, MultipartFile jobDescriptionFile) {
+    public String loadJobDescription(String jobDescriptionText, MultipartFile jobDescriptionFile) {
         if (jobDescriptionFile != null && !jobDescriptionFile.isEmpty()) {
             return documentTextExtractor.extractFromUpload(jobDescriptionFile);
-        }
-        if (jobDescriptionPath != null && !jobDescriptionPath.isBlank()) {
-            Path path = resolvePath(jobDescriptionPath);
-            return documentTextExtractor.extractFromPath(path);
         }
         if (jobDescriptionText != null && !jobDescriptionText.isBlank()) {
             return jobDescriptionText.trim();
         }
         throw new IllegalArgumentException(
-                "Job description is required: provide jobDescriptionFile, jobDescriptionPath, or jobDescription text");
-    }
-
-    public String loadDefaultResume() {
-        return stripFrontMatter(documentTextExtractor.extractFromPath(properties.defaultResumePath()));
+                "Job description is required: upload a file or paste text");
     }
 
     private Path resolveResumePath(String resumePath) {

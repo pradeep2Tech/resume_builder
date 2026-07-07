@@ -19,8 +19,7 @@ public class KeywordMatcherService {
             ExtractedJdKeywords extracted,
             String resumeText,
             SkillsRegistry registry,
-            String analysisMode,
-            String reportPath) {
+            String analysisMode) {
 
         String resumeLower = resumeText.toLowerCase(Locale.ROOT);
 
@@ -68,8 +67,7 @@ public class KeywordMatcherService {
                 synonymMatches,
                 atsFlags,
                 recommendedProjects,
-                analysisMode,
-                reportPath
+                analysisMode
         );
     }
 
@@ -95,7 +93,7 @@ public class KeywordMatcherService {
     private List<SynonymMatch> buildSynonymMatches(SkillsRegistry registry, String resumeLower) {
         List<SynonymMatch> matches = new ArrayList<>();
         registry.aliases().forEach((jdTerm, mapsTo) -> {
-            String canonical = mapsTo.split(",")[0].trim();
+            String canonical = registry.resolveCanonical(jdTerm);
             boolean present = resumeLower.contains(jdTerm.toLowerCase(Locale.ROOT))
                     || resumeLower.contains(canonical.toLowerCase(Locale.ROOT));
             matches.add(new SynonymMatch(jdTerm, canonical, present));
