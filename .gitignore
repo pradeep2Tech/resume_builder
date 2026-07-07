@@ -1,0 +1,62 @@
+# =============================================================================
+# Resume Builder — root .gitignore
+# =============================================================================
+
+# --- OS -----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# --- Secrets & local config ---------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+application-local.yml
+application-local.properties
+application-local.yaml
+**/application-local.*
+
+# --- Java / Maven -------------------------------------------------------------------
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+
+# --- IDE ----------------------------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.factorypath
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# --- Cursor (keep shared rules; ignore local/cache state) ---------------------------
+.cursor/*
+!.cursor/rules/
+
+# --- Logs & temp --------------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.swp
+*~
+
+# --- Generated career-master artifacts (source of truth is profile/companies/projects)
+career-master/output/*
+!career-master/output/README.md
