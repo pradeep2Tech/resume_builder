@@ -1,0 +1,38 @@
+---
+description: Career master workflow for JD matching and CV generation
+globs: career-master/**
+alwaysApply: false
+---
+
+# Cursor / AI instructions
+
+When the user shares a **job description**:
+
+1. Read `career-master/profile/skills.md` and JD skill aliases.
+2. Scan `career-master/cvs/index.md` and each registered CV's `skills` front matter.
+3. Calculate required-skill match % (80% threshold; nice-to-have is bonus only).
+4. If a CV matches ≥ 80%: point to `career-master/cvs/<slug>/resume.md` and suggest light edits only.
+5. If no CV matches: compose a new resume from:
+   - `profile/career-summary.md`
+   - Relevant `companies/*.md`
+   - Relevant `projects/<employer>/*.md` (prioritize JD-aligned projects)
+6. Save new CV to `career-master/cvs/<new-slug>/resume.md` and update `cvs/index.md`.
+7. For **LinkedIn profiles, cover letters, JD analysis** → write to `career-master/output/` (not master data).
+8. Never invent employers, dates, or metrics — ask the user or use placeholders marked `[TBD]`.
+
+## Layout
+
+```
+career-master/
+├── profile/           ← stable facts
+├── companies/         ← one file per employer
+├── projects/
+│   ├── tcs/
+│   ├── envestnet-yodlee/
+│   ├── entain/
+│   └── netcracker/
+├── cvs/               ← reusable CV variants
+└── output/            ← generated artifacts from prompts
+```
+
+Master data lives only under `career-master/profile`, `companies`, and `projects`. Do not duplicate profile facts into `output/` or random files.

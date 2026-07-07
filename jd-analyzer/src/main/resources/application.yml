@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 20MB
+
+spring:
+  application:
+    name: jd-analyzer
+  ai:
+    # Disable chat autoconfig unless OPENAI_API_KEY is set (see application-ai.yml profile)
+    model:
+      chat: none
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.2
+
+resume-builder:
+  career-master-path: ${CAREER_MASTER_PATH:../career-master}
+  output-subdir: output
+  skills-file: profile/skills.md
+  default-resume: cvs/pradeep-cv-2026-ats/resume.md
+  ai:
+    enabled: ${RESUME_BUILDER_AI_ENABLED:false}
+
+logging:
+  level:
+    com.resumebuilder: INFO

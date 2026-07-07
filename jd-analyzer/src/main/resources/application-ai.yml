@@ -1,0 +1,11 @@
+spring:
+  ai:
+    model:
+      chat: openai
+  config:
+    activate:
+      on-profile: ai
+
+resume-builder:
+  ai:
+    enabled: true
