@@ -8,6 +8,9 @@ server:
 spring:
   application:
     name: resume-builder
+  ai:
+    model:
+      chat: none
 
 resume-builder:
   career-master-path: ${CAREER_MASTER_PATH:../career-master}

@@ -5,7 +5,7 @@
 Personal **resume / JD matching** tool for Pradeep C.S.:
 
 1. **career-master/** — markdown source of truth (profile, employers, projects, CV variants).
-2. **jd-analyzer/** — Spring Boot 3.4 app that reads career-master, accepts a JD, returns keyword match JSON, serves a browser UI.
+2. **jd-analyzer/** — Spring Boot 4.0 app that reads career-master, accepts a JD, returns keyword match JSON, serves a browser UI.
 
 Not in production. No auth. Single-user local tool.
 
@@ -73,10 +73,12 @@ matchScore = (matchedRequired / requiredCount) * 100   // integer division
 
 | Removed | Reason |
 |---------|--------|
-| Spring AI / OpenAI | Simpler MVP; rule-based only |
 | AnalysisReportWriter | Results shown in UI, not markdown files |
 | `writeReport`, `reportSlug` | No file output by default |
-| `application-ai.yml` | No AI profile |
+
+## Optional AI mode
+
+Spring AI 2.0 is available via profile `ai` (`application-ai.yml`). Default mode remains rule-based; `KeywordMatcherService` scoring is unchanged.
 
 ## Key config
 

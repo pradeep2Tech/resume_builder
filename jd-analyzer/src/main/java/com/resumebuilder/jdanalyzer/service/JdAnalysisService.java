@@ -48,6 +48,7 @@ public class JdAnalysisService {
         );
         ExtractedJdKeywords extracted = keywordExtractorService.extract(jobDescription, registry);
 
-        return keywordMatcherService.match(extracted, resumeText, registry, "rule-based");
+        String analysisMode = keywordExtractorService.isAiEnabled() ? "spring-ai" : "rule-based";
+        return keywordMatcherService.match(extracted, resumeText, registry, analysisMode);
     }
 }

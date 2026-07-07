@@ -6,12 +6,12 @@ Install and verify before running the app.
 
 | Requirement | Version | Verify |
 |-------------|---------|--------|
-| **Java JDK** | 17 or later (tested on 21) | `java -version` |
+| **Java JDK** | 21 (required) | `java -version` |
 | **Maven** | 3.9+ | `mvn -version` |
 | **career-master/** | Must exist and be readable | See layout below |
 | **Network** | Port **8080** free on localhost | See [Check port](#check-port-8080) |
 
-No database, Docker, Node.js, or API keys required.
+No database, Docker, or Node.js required. OpenAI API key only needed for optional `ai` profile.
 
 ### Verify Java
 
@@ -19,9 +19,9 @@ No database, Docker, Node.js, or API keys required.
 java -version
 ```
 
-Expected: `openjdk version "17"` or higher (e.g. `21`).
+Expected: `openjdk version "21"` or higher.
 
-If missing: install [Eclipse Temurin JDK 17+](https://adoptium.net/) or Oracle JDK 17+ and ensure `JAVA_HOME` / `PATH` are set.
+If missing: install [Eclipse Temurin JDK 21](https://adoptium.net/) and ensure `JAVA_HOME` / `PATH` are set.
 
 ### Verify Maven
 
@@ -81,6 +81,16 @@ cd jd-analyzer
 $env:CAREER_MASTER_PATH = "C:\path\to\career-master"
 mvn spring-boot:run
 ```
+
+### Option D — AI keyword extraction (optional)
+
+```powershell
+cd jd-analyzer
+$env:OPENAI_API_KEY = "<your-key>"
+mvn spring-boot:run -Dspring-boot.run.profiles=ai
+```
+
+Uses Spring AI 2.0 for JD keyword extraction; matching scores still use rule-based `KeywordMatcherService`.
 
 ### Confirm it is running
 

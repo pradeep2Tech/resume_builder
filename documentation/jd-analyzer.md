@@ -1,6 +1,6 @@
 # jd-analyzer (Backend)
 
-Spring Boot 3.4 · Java 17 · Maven · port **8080**.
+Spring Boot 4.0 · Java 21 · Spring AI 2.0 · Maven · port **8080**.
 
 ## REST API
 
@@ -28,7 +28,7 @@ Static UI at `/` (index.html).
 - `niceToHaveKeywords`, `matchedNiceToHave`, `missingNiceToHave`
 - `synonymMatches[]` — `{ jdTerm, canonicalTerm, presentInResume }`
 - `atsFlags[]`, `recommendedProjects[]`
-- `analysisMode` — always `"rule-based"` currently
+- `analysisMode` — `"rule-based"` (default) or `"spring-ai"` (with `ai` profile + API key)
 
 ## Services
 
@@ -43,11 +43,15 @@ Static UI at `/` (index.html).
 | `KeywordMatcherService` | Score + ATS flags + project recommendations |
 | `JdAnalysisService` | Orchestrates analyze flow |
 
-## Keyword extraction (rule-based)
+## Keyword extraction
+
+**Default (rule-based):**
 
 1. For each skill in `skills.md` master list → if term in JD → required or nice-to-have (context window: "preferred", "bonus", etc.).
 2. Same for alias keys → map to canonical skill.
-3. No LLM; deterministic and offline.
+3. Deterministic and offline; no API key required.
+
+**Optional (Spring AI 2.0):** activate profile `ai` and set `OPENAI_API_KEY`. JD keywords are extracted via ChatClient; falls back to rule-based on failure. Matching/scoring still uses `KeywordMatcherService` (same similarity logic).
 
 ## Project recommendations
 
@@ -83,7 +87,8 @@ Run: `cd jd-analyzer && mvn test`
 ## Dependencies (pom.xml)
 
 - `spring-boot-starter-web`
+- `spring-boot-starter-validation`
+- `spring-ai-starter-model-openai` (BOM 2.0.0; disabled unless `ai` profile)
+- `spring-boot-starter-webmvc-test` (test scope; Spring Boot 4 MockMvc)
 - `pdfbox` 3.0.3
 - `poi-ooxml` 5.3.0
-
-No Spring AI, no validation starter.

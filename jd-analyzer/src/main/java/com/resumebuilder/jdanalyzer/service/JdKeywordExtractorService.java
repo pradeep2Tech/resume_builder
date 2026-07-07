@@ -1,8 +1,15 @@
 package com.resumebuilder.jdanalyzer.service;
 
+import com.resumebuilder.jdanalyzer.config.AiConfiguration.AiEnabledHolder;
 import com.resumebuilder.jdanalyzer.model.ExtractedJdKeywords;
 import com.resumebuilder.jdanalyzer.model.SkillsRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -14,8 +21,72 @@ import java.util.regex.Pattern;
 @Service
 public class JdKeywordExtractorService {
 
+    private static final Logger log = LoggerFactory.getLogger(JdKeywordExtractorService.class);
+    private static final Pattern JSON_BLOCK = Pattern.compile("```(?:json)?\\s*([\\s\\S]*?)```", Pattern.CASE_INSENSITIVE);
+
+    private final JsonMapper jsonMapper;
+    private final boolean aiEnabled;
+    private final ChatClient chatClient;
+
+    public JdKeywordExtractorService(
+            ObjectProvider<ChatClient.Builder> chatClientBuilder,
+            JsonMapper jsonMapper,
+            AiEnabledHolder aiEnabledHolder) {
+        this.jsonMapper = jsonMapper;
+        this.aiEnabled = aiEnabledHolder.enabled() && chatClientBuilder.getIfAvailable() != null;
+        this.chatClient = aiEnabled
+                ? chatClientBuilder.getObject().build()
+                : null;
+    }
+
     public ExtractedJdKeywords extract(String jobDescription, SkillsRegistry registry) {
+        if (aiEnabled && chatClient != null) {
+            try {
+                return extractWithAi(jobDescription);
+            } catch (Exception e) {
+                log.warn("AI extraction failed, falling back to rule-based extraction: {}", e.getMessage());
+            }
+        }
         return extractWithRules(jobDescription, registry);
+    }
+
+    public boolean isAiEnabled() {
+        return aiEnabled;
+    }
+
+    private ExtractedJdKeywords extractWithAi(String jobDescription) throws Exception {
+        String prompt = """
+                Extract ATS-relevant keywords from this job description.
+                Return ONLY valid JSON with this schema:
+                {
+                  "required": ["skill or keyword"],
+                  "niceToHave": ["skill or keyword"],
+                  "certifications": ["cert name"],
+                  "softSkills": ["leadership, communication, etc."]
+                }
+                Rules:
+                - required = must-have skills, tools, platforms, years-of-experience phrases
+                - niceToHave = preferred/bonus skills only
+                - Use concise canonical terms (e.g. Kubernetes not K8s unless JD only says K8s)
+                - Do not invent skills not present in the JD
+
+                Job description:
+                %s
+                """.formatted(jobDescription);
+
+        String raw = chatClient.prompt()
+                .user(prompt)
+                .call()
+                .content();
+
+        String json = unwrapJson(raw);
+        JsonNode root = jsonMapper.readTree(json);
+        return new ExtractedJdKeywords(
+                readArray(root, "required"),
+                readArray(root, "niceToHave"),
+                readArray(root, "certifications"),
+                readArray(root, "softSkills")
+        );
     }
 
     private ExtractedJdKeywords extractWithRules(String jobDescription, SkillsRegistry registry) {
@@ -78,5 +149,35 @@ public class JdKeywordExtractorService {
         return Pattern.compile("\\b" + Pattern.quote(normalized) + "\\b", Pattern.CASE_INSENSITIVE)
                 .matcher(jdLower)
                 .find();
+    }
+
+    private List<String> readArray(JsonNode root, String field) {
+        JsonNode node = root.path(field);
+        if (!node.isArray()) {
+            return List.of();
+        }
+        List<String> values = new ArrayList<>();
+        node.forEach(item -> {
+            if (item.isTextual() && !item.asText().isBlank()) {
+                values.add(item.asText().trim());
+            }
+        });
+        return values;
+    }
+
+    private String unwrapJson(String raw) {
+        if (raw == null) {
+            return "{}";
+        }
+        var matcher = JSON_BLOCK.matcher(raw.trim());
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
+        int start = raw.indexOf('{');
+        int end = raw.lastIndexOf('}');
+        if (start >= 0 && end > start) {
+            return raw.substring(start, end + 1);
+        }
+        return raw.trim();
     }
 }

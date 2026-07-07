@@ -2,12 +2,19 @@
 
 High-level history for AI context — avoid re-reading git log.
 
+## 2026-07-07 — Spring Boot 4 / Java 21 / Spring AI 2.0
+
+- Upgraded `jd-analyzer` to Spring Boot 4.0.7, Java 21, Spring AI 2.0.0 BOM.
+- Restored optional AI JD extraction (`ai` profile + `application-ai.yml`); default remains rule-based.
+- `KeywordMatcherService` scoring unchanged — same match % and keyword lists in rule-based mode.
+- Spring Boot 4 test fix: `spring-boot-starter-webmvc-test`, `@AutoConfigureMockMvc` import path updated.
+
 ## 2026-07-07 — Web UI MVP
 
 - Replaced curl/API-only workflow with browser UI at `http://localhost:8080`.
 - Static frontend: `index.html`, `app.js`, `style.css` (no npm).
 - Added `GET /api/v1/profile`, `GET /api/v1/cvs`.
-- **Removed:** Spring AI, `AnalysisReportWriter`, markdown report output, `writeReport` flag.
+- **Removed:** `AnalysisReportWriter`, markdown report output, `writeReport` flag.
 - Analysis mode: **rule-based only** (`skills.md` matching).
 - CV discovery: scan `cvs/*/resume.md` (not `cvs/index.md` table).
 
